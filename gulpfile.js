@@ -27,12 +27,14 @@ const distBase = '../_static/dist';
 const srcPath = {
   'scss': assetsBase + './scss/**/*.scss',
   'html': srcBase + './**/*.html',
+  'js': assetsBase + './js/**/*.js',
   'img': assetsBase + './img/**/*'
 };
 
 const distPath = {
   'css': distBase + '/css/',
   'html': distBase + '/',
+  'js': assetsBase + '/js/',
   'img': distBase + '/img/'
 };
 
