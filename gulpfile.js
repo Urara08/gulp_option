@@ -1,10 +1,21 @@
-const gulp = require('gulp');//gulp本体
+const gulp = require('gulp');
+const del = require('del');
 
 //scss
 const sass = require('gulp-dart-sass');//Dart Sass はSass公式が推奨 @use構文などが使える
 const plumber = require("gulp-plumber"); // エラーが発生しても強制終了させない
 const notify = require("gulp-notify"); // エラー発生時のアラート出力
 const browserSync = require("browser-sync"); //ブラウザリロード
+const autoprefixer = require('gulp-autoprefixer');//ベンダープレフィックス自動付与
+const postcss = require("gulp-postcss");//css-mqpackerを使うために必要
+const mqpacker = require('css-mqpacker');//メディアクエリをまとめる
+
+
+//画像圧縮
+const imagemin = require("gulp-imagemin");
+const imageminMozjpeg = require("imagemin-mozjpeg");
+const imageminPngquant = require("imagemin-pngquant");
+const imageminSvgo = require("imagemin-svgo");
 
 
 // 入出力するフォルダを指定
@@ -15,13 +26,30 @@ const distBase = '../_static/dist';
 
 const srcPath = {
   'scss': assetsBase + './scss/**/*.scss',
-  'html': srcBase + './**/*.html'
+  'html': srcBase + './**/*.html',
+  'img': assetsBase + './img/**/*'
 };
 
 const distPath = {
   'css': distBase + '/css/',
-  'html': distBase + '/'
+  'html': distBase + '/',
+  'img': distBase + '/img/'
 };
+
+/**
+ * clean
+ */
+ const clean = () => {
+  return del([distBase + './**'], {
+    force: true
+  });
+}
+
+//ベンダープレフィックスを付与する条件
+const TARGET_BROWSERS = [
+  'last 2 versions',//各ブラウザの2世代前までのバージョンを担保
+  'ie >= 11'//IE11を担保
+];
 
 /**
  * sass
@@ -37,12 +65,39 @@ const cssSass = () => {
         errorHandler: notify.onError('Error:<%= error.message %>')
       }))
     .pipe(sass({ outputStyle: 'expanded' })) //指定できるキー expanded compressed
+    .pipe(autoprefixer(TARGET_BROWSERS))// ベンダープレフィックス自動付与
+    .pipe(postcss([mqpacker()])) // メディアクエリをまとめる
     .pipe(gulp.dest(distPath.css, { sourcemaps: './' })) //コンパイル先
     .pipe(browserSync.stream())
     .pipe(notify({
       message: 'Sassをコンパイルしました！',
       onLast: true
     }))
+}
+
+/**
+ * 画像圧縮
+ */
+ const imgImagemin = () => {
+  return gulp.src(srcPath.img)
+    .pipe(
+      imagemin(
+        [
+          imageminMozjpeg({
+            quality: 80
+          }),
+          imageminPngquant(),
+          imageminSvgo({
+            plugins: [{
+              removeViewbox: false
+            }]
+          })
+        ], {
+          verbose: true
+        }
+      )
+    )
+    .pipe(gulp.dest(distPath.img))
 }
 
 
@@ -82,6 +137,7 @@ const browserSyncReload = (done) => {
 const watchFiles = () => {
   gulp.watch(srcPath.scss, gulp.series(cssSass))
   gulp.watch(srcPath.html, gulp.series(html, browserSyncReload))
+  gulp.watch(srcPath.img, gulp.series(imgImagemin, browserSyncReload))
 }
 
 /**
@@ -89,6 +145,7 @@ const watchFiles = () => {
  * parallelは並列で実行
  */
 exports.default = gulp.series(
-  gulp.parallel(html, cssSass),
+  clean,
+  gulp.parallel(html, cssSass,imgImagemin),
   gulp.parallel(watchFiles, browserSyncFunc)
 );
