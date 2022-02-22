@@ -21,7 +21,7 @@ const imageminSvgo = require("imagemin-svgo");
 // 入出力するフォルダを指定
 const srcBase = './';
 const assetsBase = './';
-const distBase = '../_static/dist';
+const distBase = './';
 
 
 const srcPath = {

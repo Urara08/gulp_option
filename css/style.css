@@ -1,9 +1,13 @@
 h1 {
-  color: blue;
+  color: #d0ff00;
 }
 h1 span {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   position: relative;
 }
 h1 span::before, h1 span::after {
@@ -14,18 +18,24 @@ h1 span::before, h1 span::after {
   background-color: green;
 }
 h1 span::before {
-  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
 }
 h1 span::after {
-  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
 }
 
 h2 {
   color: #ff2600;
 }
 h2 span {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   position: relative;
 }
 h2 span::before, h2 span::after {
@@ -36,10 +46,12 @@ h2 span::before, h2 span::after {
   background-color: green;
 }
 h2 span::before {
-  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
 }
 h2 span::after {
-  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
 }
 
 h3 {
